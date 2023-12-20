@@ -1,21 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using System;
 using Reservation.Models;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Reservation.Controllers
 {
-    
 
-    [Route("api/providers")]
+    [Route("api/appointment")]
     [ApiController]
-    public class ProvidersController : ControllerBase
+    public class AppointmentController : ControllerBase
     {
         private readonly IMemoryCache _cache;
 
-        public ProvidersController(IMemoryCache cache)
+        public AppointmentController(IMemoryCache cache)
         {
             _cache = cache;
 
@@ -46,12 +42,6 @@ namespace Reservation.Controllers
         public IActionResult SubmitAvailability([FromBody] Appointment newAppointment)
         {
             var providers = _cache.Get<List<Provider>>("Providers");
-            //var provider = providers.FirstOrDefault(p => p.Id == newAppointment.ProviderId);
-
-            //if (provider == null)
-            //{
-            //    return NotFound("Provider not found.");
-            //}
 
             var appointments = _cache.Get<List<Appointment>>("Appointments");
 
@@ -82,6 +72,7 @@ namespace Reservation.Controllers
             return Ok("Provider's availability submitted successfully.");
         }
 
+        // Helper method to get 15 minutes time slots based on provider's availability
         private List<DateTime> GetTimeSlots(DateTime start, DateTime end)
         {
             var timeSlots = new List<DateTime>();
@@ -94,6 +85,7 @@ namespace Reservation.Controllers
             return timeSlots;
         }
 
+        // Helper method to get unique appointment id
         private int GetUniqueAppointmentId(List<Appointment>? appointments)
         {
             return appointments?.Count > 0 ? appointments.Max(a => a.Id) + 1 : 1;
@@ -189,5 +181,4 @@ namespace Reservation.Controllers
             return Ok(appointment);
         }
     }
-
 }
